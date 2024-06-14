@@ -64,29 +64,7 @@ compatible implementation on the classpath.
 
 ## :scroll: Usage
 
-```java
-import com.retailsvc.gcp.pubsub.ObjectToBytesMapper;
-import com.retailsvc.gcp.pubsub.PooledPublisherFactory;
-
-ObjectMapper jsonMapper = new ObjectMapper();
-ObjectToBytesMapper objectMapper = v -> ByteBuffer.wrap(jsonMapper.writeValueAsBytes(v));
-
-PubSubClientFactory factory = new PubSubClientFactory(objectMapper,
-  PooledPublisherFactory.defaultPool());
-
-PubSubClient pubSubClient = factory.create("example.entities.v1");
-
-Object payload = ...
-/*
- 'payload' could be any of the supported types:
-  - String, such as "{ .. }", "my text" etc.
-  - ByteBuffer
-  - InputStream
-  - Any Jackson serializable type such as Record class, List etc.
-*/
-Map<String, String> attributes = Map.of("Tenant-Id", "...", "key", "value");
-pubSubClient.publish(payload, attributes);
-```
+TBD
 
 ## :wrench: Local development environment
 
