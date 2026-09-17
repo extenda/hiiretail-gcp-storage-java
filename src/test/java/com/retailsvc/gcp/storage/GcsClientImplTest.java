@@ -19,6 +19,9 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -137,9 +140,9 @@ class GcsClientImplTest {
       files.put(name, HELLO);
       server.enqueue(
           (request, exchange) ->
-              (new String(request.body(), UTF_8).contains("\"name\":\"fail")
-                      ? respond(503, "{}")
-                      : respond(200, "{}"))
+              respond(
+                      new String(request.body(), UTF_8).contains("\"name\":\"fail") ? 503 : 200,
+                      "{}")
                   .respond(request, exchange));
     }
 
@@ -156,6 +159,7 @@ class GcsClientImplTest {
   void saveAllRunsAtMostMaxConcurrencyUploadsAtOnce() {
     var inFlight = new AtomicInteger();
     var maxInFlight = new AtomicInteger();
+    var pairedUp = new CyclicBarrier(2);
     var files = new LinkedHashMap<String, byte[]>();
     for (int i = 0; i < 6; i++) {
       files.put("o" + i, HELLO);
@@ -163,11 +167,14 @@ class GcsClientImplTest {
           (request, exchange) -> {
             maxInFlight.accumulateAndGet(inFlight.incrementAndGet(), Math::max);
             try {
-              Thread.sleep(100);
-            } catch (InterruptedException e) {
+              pairedUp.await(2, TimeUnit.SECONDS);
+            } catch (InterruptedException _) {
               Thread.currentThread().interrupt();
+            } catch (BrokenBarrierException | TimeoutException _) {
+              // No second upload arrived; the assertion on maxInFlight reports it.
+            } finally {
+              inFlight.decrementAndGet();
             }
-            inFlight.decrementAndGet();
             respond(200, "{}").respond(request, exchange);
           });
     }

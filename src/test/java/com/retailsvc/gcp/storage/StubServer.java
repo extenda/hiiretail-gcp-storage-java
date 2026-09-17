@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -86,8 +87,9 @@ final class StubServer implements AutoCloseable {
       exchange.sendResponseHeaders(200, 10);
       exchange.getResponseBody().flush();
       try {
-        Thread.sleep(Long.MAX_VALUE);
-      } catch (InterruptedException e) {
+        // Never counted down: only the interrupt from close() ends the wait.
+        new CountDownLatch(1).await();
+      } catch (InterruptedException _) {
         Thread.currentThread().interrupt();
       }
     };

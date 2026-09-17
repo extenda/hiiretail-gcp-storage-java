@@ -1,10 +1,15 @@
 package com.retailsvc.gcp.storage;
 
+import static java.net.HttpURLConnection.HTTP_CLIENT_TIMEOUT;
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+
 import com.google.auth.Retryable;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class GcsClientException extends RuntimeException {
+
+  private static final int TOO_MANY_REQUESTS = 429;
 
   private final int status;
   private final boolean retryable;
@@ -21,7 +26,12 @@ public class GcsClientException extends RuntimeException {
 
   static GcsClientException ofStatus(int status, String message) {
     return new GcsClientException(
-        message, status, status == 408 || status == 429 || status >= 500, null);
+        message,
+        status,
+        status == HTTP_CLIENT_TIMEOUT
+            || status == TOO_MANY_REQUESTS
+            || status >= HTTP_INTERNAL_ERROR,
+        null);
   }
 
   /**

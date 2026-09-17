@@ -1,5 +1,8 @@
 package com.retailsvc.gcp.storage;
 
+import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_PRECON_FAILED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.auth.Credentials;
@@ -126,7 +129,7 @@ final class GcsClientImpl implements GcsClient {
   public Optional<byte[]> load(String bucket, String name) {
     var uri = uri(STORAGE + ref(bucket, name), "alt", "media");
     var response = send(request(uri).GET(), BodyHandlers.ofByteArray());
-    if (response.statusCode() == 404) {
+    if (response.statusCode() == HTTP_NOT_FOUND) {
       return Optional.empty();
     }
     var content = ok(response).body();
@@ -154,7 +157,7 @@ final class GcsClientImpl implements GcsClient {
     }
     var uri = uri(STORAGE + ref(bucket, from) + "/moveTo/o/" + encode(to), IF_GENERATION_MATCH, 0);
     var response = post(uri);
-    if (response.statusCode() == 404) {
+    if (response.statusCode() == HTTP_NOT_FOUND) {
       throw notFound(bucket, from);
     }
     created(response, bucket, to);
@@ -172,7 +175,7 @@ final class GcsClientImpl implements GcsClient {
   private void copyThenDelete(String fromBucket, String from, String toBucket, String to) {
     var statUri = uri(STORAGE + ref(fromBucket, from));
     var stat = send(request(statUri).GET(), BodyHandlers.ofString());
-    if (stat.statusCode() == 404) {
+    if (stat.statusCode() == HTTP_NOT_FOUND) {
       throw notFound(fromBucket, from);
     }
     var generation = GcsJson.generation(ok(stat).body());
@@ -193,7 +196,7 @@ final class GcsClientImpl implements GcsClient {
     var deleteUri = uri(STORAGE + ref(fromBucket, from), IF_GENERATION_MATCH, generation);
     if (!delete(deleteUri)) {
       throw GcsClientException.ofStatus(
-          404,
+          HTTP_NOT_FOUND,
           "Source gs://%s/%s vanished before delete; copied to gs://%s/%s"
               .formatted(fromBucket, from, toBucket, to));
     }
@@ -223,7 +226,7 @@ final class GcsClientImpl implements GcsClient {
                 boundary,
                 metadata,
                 Objects.requireNonNullElse(contentType, "application/octet-stream"));
-    var tail = "\r\n--%s--\r\n".formatted(boundary);
+    var tail = "\r\n--" + boundary + "--\r\n";
     var uri =
         uri(
             "/upload" + STORAGE + "/b/" + encode(bucket) + "/o",
@@ -241,12 +244,13 @@ final class GcsClientImpl implements GcsClient {
   }
 
   private static GcsClientException notFound(String bucket, String name) {
-    return GcsClientException.ofStatus(404, "gs://%s/%s not found".formatted(bucket, name));
+    return GcsClientException.ofStatus(
+        HTTP_NOT_FOUND, "gs://%s/%s not found".formatted(bucket, name));
   }
 
   private boolean delete(URI uri) {
     var response = send(request(uri).DELETE(), BodyHandlers.ofString());
-    if (response.statusCode() == 404) {
+    if (response.statusCode() == HTTP_NOT_FOUND) {
       return false;
     }
     ok(response);
@@ -332,14 +336,14 @@ final class GcsClientImpl implements GcsClient {
 
   /** Like {@link #ok}, but a failed create-only precondition means the target exists. */
   private static <T> HttpResponse<T> created(HttpResponse<T> response, String bucket, String name) {
-    if (response.statusCode() == 412) {
+    if (response.statusCode() == HTTP_PRECON_FAILED) {
       throw new AlreadyExistsException("gs://%s/%s already exists".formatted(bucket, name));
     }
     return ok(response);
   }
 
   private static <T> HttpResponse<T> ok(HttpResponse<T> response) {
-    if (response.statusCode() >= 300) {
+    if (response.statusCode() >= HTTP_MULT_CHOICE) {
       var body =
           response.body() instanceof byte[] bytes
               ? new String(bytes, UTF_8)
