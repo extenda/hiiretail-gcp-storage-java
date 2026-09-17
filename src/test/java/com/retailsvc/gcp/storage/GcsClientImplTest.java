@@ -221,6 +221,7 @@ class GcsClientImplTest {
 
     assertThatExceptionOfType(ChecksumMismatchException.class)
         .isThrownBy(() -> client.load("b", "o"))
+        .satisfies(e -> assertThat(e.status()).isEqualTo(200))
         .satisfies(e -> assertThat(e.retryable()).isTrue());
   }
 

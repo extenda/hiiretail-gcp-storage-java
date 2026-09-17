@@ -6,7 +6,10 @@ package com.retailsvc.gcp.storage;
  */
 public class ChecksumMismatchException extends GcsClientException {
 
-  public ChecksumMismatchException(String message) {
-    super(message, 0, true, null);
+  /**
+   * @param status the HTTP status of the response whose content failed verification
+   */
+  public ChecksumMismatchException(String message, int status) {
+    super(message, status, true, null);
   }
 }

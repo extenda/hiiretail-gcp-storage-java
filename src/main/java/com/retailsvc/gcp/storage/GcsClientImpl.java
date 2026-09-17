@@ -135,7 +135,8 @@ final class GcsClientImpl implements GcsClient {
     if (!actual.equals(stored)) {
       throw new ChecksumMismatchException(
           "crc32c mismatch for gs://%s/%s: stored %s, downloaded %s"
-              .formatted(bucket, name, stored, actual));
+              .formatted(bucket, name, stored, actual),
+          response.statusCode());
     }
     return Optional.of(content);
   }
