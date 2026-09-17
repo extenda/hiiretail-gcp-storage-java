@@ -38,6 +38,10 @@ final class GcsClientImpl implements GcsClient {
 
   private static final String STORAGE = "/storage/v1";
   private static final String IF_GENERATION_MATCH = "ifGenerationMatch";
+
+  /** An {@value #IF_GENERATION_MATCH} value meaning "no object exists here": create only. */
+  private static final int ABSENT = 0;
+
   private static final String CRC32C = "crc32c=";
 
   private final HttpClient http;
@@ -155,7 +159,8 @@ final class GcsClientImpl implements GcsClient {
       copyThenDelete(bucket, from, bucket, to);
       return;
     }
-    var uri = uri(STORAGE + ref(bucket, from) + "/moveTo/o/" + encode(to), IF_GENERATION_MATCH, 0);
+    var uri =
+        uri(STORAGE + ref(bucket, from) + "/moveTo/o/" + encode(to), IF_GENERATION_MATCH, ABSENT);
     var response = post(uri);
     if (response.statusCode() == HTTP_NOT_FOUND) {
       throw notFound(bucket, from);
@@ -187,7 +192,7 @@ final class GcsClientImpl implements GcsClient {
               "sourceGeneration",
               generation,
               IF_GENERATION_MATCH,
-              0,
+              ABSENT,
               "rewriteToken",
               rewrite == null ? null : rewrite.rewriteToken());
       rewrite = GcsJson.rewrite(created(post(uri), toBucket, to).body());
@@ -233,7 +238,7 @@ final class GcsClientImpl implements GcsClient {
             "uploadType",
             "multipart",
             IF_GENERATION_MATCH,
-            createOnly ? 0 : null);
+            createOnly ? ABSENT : null);
     var request =
         request(uri)
             .header("Content-Type", "multipart/related; boundary=" + boundary)
