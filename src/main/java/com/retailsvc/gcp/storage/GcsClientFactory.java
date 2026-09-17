@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Predicate;
 
 /**
@@ -28,6 +29,8 @@ public class GcsClientFactory {
   private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
   private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(60);
   private static final int DEFAULT_MAX_CONCURRENCY = 16;
+  private static final ThreadFactory IO_THREADS =
+      Thread.ofVirtual().name("gcs-client-", 0).factory();
 
   private Duration requestTimeout;
   private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
@@ -53,7 +56,11 @@ public class GcsClientFactory {
             .or(() -> setting(REQUEST_TIMEOUT_SECONDS).map(GcsClientFactory::timeoutSetting))
             .orElse(DEFAULT_REQUEST_TIMEOUT);
     var emulator = setting(EMULATOR_HOST);
-    var http = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT);
+    // The JDK's default executor is a cached pool of platform threads; run the I/O on virtual ones.
+    var http =
+        HttpClient.newBuilder()
+            .connectTimeout(CONNECT_TIMEOUT)
+            .executor(task -> IO_THREADS.newThread(task).start());
     // Plain-HTTP emulators don't speak HTTP/2; skip the h2c upgrade attempt.
     emulator.ifPresent(host -> http.version(HttpClient.Version.HTTP_1_1));
     Credentials credentials =

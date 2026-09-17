@@ -86,6 +86,8 @@ try (GcsClient client = new GcsClientFactory()
   no atomic move, so against one `move` copies and deletes too.
 * **Batches:** `saveAll` saves the files in parallel, at most `withMaxConcurrency` (default 16) at a
   time across the client, and returns the failures by name in the files' iteration order.
+* **Threads:** the client runs its HTTP I/O on virtual threads, and `saveAll` uploads on virtual
+  threads too, so waiting for GCS never occupies a platform thread.
 * **Errors:** failures throw `GcsClientException`, whose `status()` is the HTTP status (0 when there
   was no response) and whose `retryable()` says whether retrying may help. The exceptions have
   public constructors, so test doubles can throw them.
