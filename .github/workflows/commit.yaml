@@ -6,6 +6,7 @@ permissions:
 
 jobs:
   test:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,6 +37,18 @@ jobs:
           sonar-scanner: maven
           main-branch: master
           service-account-key: ${{ secrets.SECRET_AUTH }}
+
+  # Dependabot runs can't read SECRET_AUTH, and must not get an OIDC token while
+  # running the bumped dependencies' code. Everything resolves from Maven Central.
+  test-dependabot:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - *setup-java
+
+      - name: Run tests
+        run: ./mvnw -V -B verify
 
   release:
     if: github.ref == 'refs/heads/master'
