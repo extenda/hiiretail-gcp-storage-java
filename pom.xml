@@ -29,24 +29,25 @@
   </developers>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>25</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Sonar settings -->
-    <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
-    <sonar.jacoco.reportPaths>${project.build.directory}/jacoco.exec, ${user.dir}/target/jacoco-it.exec</sonar.jacoco.reportPaths>
     <version.assertj>3.27.7</version.assertj>
-    <version.google-cloud>26.88.1</version.google-cloud>
     <version.jacoco-maven-plugin>0.8.15</version.jacoco-maven-plugin>
     <version.junit-jupiter>6.1.3</version.junit-jupiter>
+    <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
     <version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
     <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
     <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
-    <version.mockito>5.23.0</version.mockito>
     <version.slf4j>2.0.19</version.slf4j>
     <version.testcontainers>2.0.5</version.testcontainers>
+    <version.google-auth>1.52.0</version.google-auth>
+    <version.gson>2.14.0</version.gson>
+    <version.guava>33.7.1-jre</version.guava>
+    <version.grpc>1.84.0</version.grpc>
+    <version.error-prone>2.50.0</version.error-prone>
   </properties>
 
   <scm>
@@ -72,38 +73,21 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.google.cloud</groupId>
-        <artifactId>libraries-bom</artifactId>
-        <version>${version.google-cloud}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
         <version>${version.testcontainers}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-junit-jupiter</artifactId>
-        <version>${version.mockito}</version>
-        <scope>test</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
     <dependency>
-      <groupId>com.google.cloud</groupId>
-      <artifactId>google-cloud-storage</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${version.slf4j}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -117,19 +101,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers-gcloud</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>${version.assertj}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -137,6 +111,87 @@
       <artifactId>slf4j-simple</artifactId>
       <version>${version.slf4j}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.auth</groupId>
+      <artifactId>google-auth-library-oauth2-http</artifactId>
+      <version>${version.google-auth}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.errorprone</groupId>
+          <artifactId>error_prone_annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.j2objc</groupId>
+          <artifactId>j2objc-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.grpc</groupId>
+          <artifactId>grpc-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jspecify</groupId>
+          <artifactId>jspecify</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${version.gson}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.errorprone</groupId>
+          <artifactId>error_prone_annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${version.guava}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.errorprone</groupId>
+          <artifactId>error_prone_annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-context</artifactId>
+      <version>${version.grpc}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.errorprone</groupId>
+          <artifactId>error_prone_annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.errorprone</groupId>
+      <artifactId>error_prone_annotations</artifactId>
+      <version>${version.error-prone}</version>
     </dependency>
   </dependencies>
 
@@ -147,22 +202,15 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.maven-compiler-plugin}</version>
       </plugin>
-      <!-- Tests and code coverage -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${version.maven-surefire-plugin}</version>
-        <configuration>
-          <argLine>@{argLine} -Dfile.encoding=UTF-8</argLine>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${version.maven-failsafe-plugin}</version>
-        <configuration>
-          <argLine>@{argLine} -Dfile.encoding=UTF-8</argLine>
-        </configuration>
         <executions>
           <execution>
             <goals>
@@ -177,7 +225,6 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>${version.maven-jar-plugin}</version>
       </plugin>
-      <!-- Configure to attach the sources jar file -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -198,25 +245,33 @@
         <version>${version.jacoco-maven-plugin}</version>
         <executions>
           <execution>
-            <id>jacoco-surefire</id>
+            <id>prepare-agent</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
-            <phase>initialize</phase>
-            <configuration>
-              <destFile>${project.build.directory}/jacoco.exec</destFile>
-              <append>true</append>
-            </configuration>
           </execution>
           <execution>
-            <id>jacoco-report</id>
+            <id>report</id>
             <goals>
               <goal>report</goal>
             </goals>
-            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${version.maven-enforcer-plugin}</version>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
             <configuration>
-              <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-              <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+              <rules>
+                <dependencyConvergence/>
+              </rules>
             </configuration>
           </execution>
         </executions>
