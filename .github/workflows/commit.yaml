@@ -1,6 +1,10 @@
 name: Commit
 on: push
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
       runs-on: ubuntu-latest
@@ -32,6 +36,9 @@ jobs:
   release:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     needs:
       - test
     steps:

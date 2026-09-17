@@ -56,16 +56,10 @@
 
   <distributionManagement>
     <repository>
-      <id>repo.extenda.io</id>
+      <id>artifact-registry-releases</id>
       <name>Extenda Retail Releases</name>
-      <url>https://repo.extendaretail.com/repository/maven-releases</url>
+      <url>artifactregistry://europe-west1-maven.pkg.dev/extenda/maven-releases</url>
     </repository>
-    <snapshotRepository>
-      <id>repo.extenda.io</id>
-      <name>Extenda Retail Snapshots</name>
-      <url>https://repo.extendaretail.com/repository/maven-snapshots</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
   </distributionManagement>
 
   <dependencyManagement>
