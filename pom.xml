@@ -35,7 +35,7 @@
     <!-- Sonar settings -->
     <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
     <sonar.jacoco.reportPaths>${project.build.directory}/jacoco.exec, ${user.dir}/target/jacoco-it.exec</sonar.jacoco.reportPaths>
-    <version.assertj>3.26.0</version.assertj>
+    <version.assertj>3.27.7</version.assertj>
     <version.google-cloud>26.41.0</version.google-cloud>
     <version.jacoco-maven-plugin>0.8.12</version.jacoco-maven-plugin>
     <version.junit-jupiter>5.10.1</version.junit-jupiter>
