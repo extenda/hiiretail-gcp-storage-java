@@ -41,11 +41,11 @@
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
     <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
-    <version.slf4j>2.0.19</version.slf4j>
+    <version.slf4j>2.0.20</version.slf4j>
     <version.testcontainers>2.0.5</version.testcontainers>
-    <version.google-auth>1.52.0</version.google-auth>
+    <version.google-auth>1.54.0</version.google-auth>
     <version.gson>2.14.0</version.gson>
-    <version.guava>33.7.1-jre</version.guava>
+    <version.guava>33.7.2-jre</version.guava>
     <version.grpc>1.84.0</version.grpc>
     <version.error-prone>2.50.0</version.error-prone>
   </properties>
@@ -83,13 +83,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${version.slf4j}</version>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
