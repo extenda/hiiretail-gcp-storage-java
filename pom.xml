@@ -33,21 +33,21 @@
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.assertj>3.27.7</version.assertj>
-    <version.jacoco-maven-plugin>0.8.15</version.jacoco-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.16</version.jacoco-maven-plugin>
     <version.junit-jupiter>6.1.3</version.junit-jupiter>
-    <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
+    <version.maven-enforcer-plugin>3.7.0</version.maven-enforcer-plugin>
     <version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
     <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
-    <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
-    <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
+    <version.maven-surefire-plugin>3.6.1</version.maven-surefire-plugin>
+    <version.maven-failsafe-plugin>3.6.1</version.maven-failsafe-plugin>
     <version.slf4j>2.0.20</version.slf4j>
     <version.testcontainers>2.0.5</version.testcontainers>
-    <version.google-auth>1.54.0</version.google-auth>
-    <version.gson>2.14.0</version.gson>
+    <version.google-auth>1.55.0</version.google-auth>
+    <version.gson>2.15.0</version.gson>
     <version.guava>33.7.2-jre</version.guava>
-    <version.grpc>1.84.0</version.grpc>
-    <version.error-prone>2.50.0</version.error-prone>
+    <version.grpc>1.85.1</version.grpc>
+    <version.error-prone>2.51.0</version.error-prone>
   </properties>
 
   <scm>
